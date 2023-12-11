@@ -33,3 +33,15 @@
     </table>
   </main>
 </div>
+
+<!-- Updated select element -->
+{{#if viewData.courses}}
+  <select class="form-select" name="course" id="course">
+    <option value="">Select Course</option>
+    {{#each viewData.courses}}
+      <option value="{{courseId}}" {{#if selected}} selected {{/if}}>{{courseCode}}</option>
+    {{/each}}
+  </select>
+{{else}}
+  <div>No Courses</div>
+{{/if}}

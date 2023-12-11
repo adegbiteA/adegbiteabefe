@@ -2,6 +2,7 @@
   <div class="col-md-12">
     <br />
     <h2>Students</h2>
+    <a href="/students/add" class="btn btn-success float-end">Add New Student</a>
     <hr />
     <div class="table-responsive">
       <table class="table">
@@ -13,21 +14,23 @@
             <th>Address</th>
             <th>Status</th>
             <th>Course ID</th>
+            <th></th> <!-- New column for remove link -->
           </tr>
         </thead>
         <tbody>
           {{#each students}}
             <tr>
               <td>{{this.studentNum}}</td>
-              <td><a
-                  href="/student/{{this.studentNum}}"
-                >{{this.fullName}}</a></td>
+              <td><a href="/student/{{this.studentNum}}">{{this.fullName}}</a></td>
               <td><a href="mailto:{{this.email}}">{{this.email}}</a></td>
               <td>{{this.address}}</td>
               <td>{{this.status}}</td>
-              <td><a
-                  href="/students?course={{this.courseID}}"
-                >{{this.courseID}}</a></td>
+              <td><a href="/students?course={{this.courseID}}">{{this.courseID}}</a></td>
+              <td>
+                <form method="POST" action="/students/delete/{{this.studentNum}}">
+                  <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+              </td>
             </tr>
           {{/each}}
         </tbody>

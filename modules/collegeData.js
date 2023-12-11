@@ -1,5 +1,5 @@
-var sequelize = new Sequelize('database', 'user', 'password', {
-  host: 'host',
+var sequelize = new Sequelize('A6', 'adegbiteafeeez', '************', {
+  host: 'ep-old-recipe-21714485.us-east-2.aws.neon.tech',
   dialect: 'postgres',
   port: 5432,
   dialectOptions: {
@@ -62,8 +62,306 @@ const Course = sequelize.define('Course', {
   },
 });
 
+Student.belongsToMany(Course, { through: 'StudentCourse' });
+Course.belongsToMany(Student, { through: 'StudentCourse' });
 
-Course.hasMany(Student, {foreignKey: 'course'});
+// Export the models
+module.exports = {
+  Student,
+  Course
+};
+
+
+
+
+
+// Function to initialize database and models
+function initialize() {
+  return sequelize.sync()
+    .then(() => {
+      console.log('Database and models synced successfully.');
+      return Promise.resolve();
+    })
+    .catch((err) => {
+      console.error('Unable to sync the database:', err);
+      return Promise.reject('Unable to sync the database');
+    });
+}
+
+// Function to get all students
+function getAllStudents() {
+  return Student.findAll()
+    .then((students) => {
+      if (students.length > 0) {
+        return Promise.resolve(students);
+      } else {
+        return Promise.reject('No results returned');
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching all students:', err);
+      return Promise.reject('No results returned');
+    });
+}
+
+// Function to get students by course
+function getStudentsByCourse(course) {
+  return Student.findAll({ where: { courseId: course } })
+    .then((students) => {
+      if (students.length > 0) {
+        return Promise.resolve(students);
+      } else {
+        return Promise.reject('No results returned');
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching students by course:', err);
+      return Promise.reject('No results returned');
+    });
+}
+
+// Function to get student by studentNum
+function getStudentByNum(num) {
+  return Student.findAll({ where: { studentNum: num } })
+    .then((data) => {
+      if (data.length > 0) {
+        return Promise.resolve(data[0]);
+      } else {
+        return Promise.reject('No results returned');
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching student by number:', err);
+      return Promise.reject('No results returned');
+    });
+}
+
+// Function to get all courses
+function getCourses() {
+  return Course.findAll()
+    .then((courses) => {
+      if (courses.length > 0) {
+        return Promise.resolve(courses);
+      } else {
+        return Promise.reject('No results returned');
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching all courses:', err);
+      return Promise.reject('No results returned');
+    });
+}
+
+// Function to get course by courseId
+function getCourseById(id) {
+  return Course.findAll({ where: { courseId: id } })
+    .then((data) => {
+      if (data.length > 0) {
+        return Promise.resolve(data[0]);
+      } else {
+        return Promise.reject('No results returned');
+      }
+    })
+    .catch((err) => {
+      console.error('Error fetching course by ID:', err);
+      return Promise.reject('No results returned');
+    });
+}
+
+// Function to add a student
+function addStudent(studentData) {
+  studentData.TA = (studentData.TA) ? true : false;
+  for (const key in studentData) {
+    if (studentData[key] === '') {
+      studentData[key] = null;
+    }
+  }
+
+  return Student.create(studentData)
+    .then(() => {
+      console.log('Student created successfully');
+      return Promise.resolve();
+    })
+    .catch((err) => {
+      console.error('Unable to create student:', err);
+      return Promise.reject('Unable to create student');
+    });
+}
+
+// Function to update a student
+function updateStudent(studentData) {
+  studentData.TA = (studentData.TA) ? true : false;
+  for (const key in studentData) {
+    if (studentData[key] === '') {
+      studentData[key] = null;
+    }
+  }
+
+  return Student.update(studentData, { where: { studentNum: studentData.studentNum } })
+    .then(() => {
+      console.log('Student updated successfully');
+      return Promise.resolve();
+    })
+    .catch((err) => {
+      console.error('Unable to update student:', err);
+      return Promise.reject('Unable to update student');
+    });
+}
+
+module.exports = {
+  initialize,
+  getAllStudents,
+  getStudentsByCourse,
+  getStudentByNum,
+  getCourses,
+  getCourseById,
+  addStudent,
+  updateStudent
+};
+
+// Inside collegeData.js
+
+// ...
+
+const addCourse = (courseData) => {
+  for (let key in courseData) {
+    if (courseData[key] === '') {
+      courseData[key] = null;
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    Course.create(courseData)
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((err) => {
+        reject("Unable to create course");
+      });
+  });
+};
+
+const updateCourse = (courseData) => {
+  for (let key in courseData) {
+    if (courseData[key] === '') {
+      courseData[key] = null;
+    }
+  }
+
+  const courseId = courseData.courseId;
+
+  return new Promise((resolve, reject) => {
+    Course.update(courseData, {
+      where: { courseId: courseId }
+    })
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((err) => {
+        reject("Unable to update course");
+      });
+  });
+};
+
+const deleteCourseById = (id) => {
+  return new Promise((resolve, reject) => {
+    Course.destroy({
+      where: { courseId: id }
+    })
+      .then((result) => {
+        if (result === 0) {
+          reject("Course not found");
+        } else {
+          resolve("Course deleted successfully");
+        }
+      })
+      .catch((err) => {
+        reject("Unable to delete course");
+      });
+  });
+};
+
+module.exports = {
+  // Other functions
+  addCourse,
+  updateCourse,
+  deleteCourseById
+};
+
+const deleteStudentByNum = (studentNum) => {
+  return new Promise((resolve, reject) => {
+    Student.destroy({
+      where: {
+        studentNum: studentNum 
+      }
+    })
+      .then((deletedRows) => {
+        
+        if (deletedRows > 0) {
+          resolve('Student deleted successfully');
+        } else {
+          reject(new Error('Student not found'));
+        }
+      })
+      .catch((err) => {
+        reject(err); 
+      });
+  });
+};
+
+module.exports = {
+  deleteStudentByNum
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Function that initializes the data by instantiating the Data class with the given students and courses data datasets.
